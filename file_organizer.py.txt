@@ -1,0 +1,45 @@
+
+from pathlib import Path
+import shutil
+
+# Create a test folder
+folder = Path("test_files")
+folder.mkdir(exist_ok=True)
+
+# Create sample files
+for name in ["notes.txt", "photo.jpg",
+             "report.pdf", "script.py"]:
+    file_path = folder / name
+    if not file_path.exists():
+        file_path.write_text("Sample file")
+
+categories = {
+    "Images": [".jpg", ".jpeg", ".png"],
+    "Documents": [".pdf", ".docx", ".txt"],
+    "Python": [".py"]
+}
+
+for file in list(folder.iterdir()):
+    if not file.is_file():
+        continue
+
+    extension = file.suffix.lower()
+    destination = "Others"
+
+    for category, extensions in categories.items():
+        if extension in extensions:
+            destination = category
+            break
+
+    target_folder = folder / destination
+    target_folder.mkdir(exist_ok=True)
+
+    target_file = target_folder / file.name
+    if target_file.exists():
+        print("Skipped existing file:", file.name)
+        continue
+
+    shutil.move(str(file), str(target_file))
+    print(f"Moved {file.name} to {destination}")
+
+print("\nFile organization completed!")
